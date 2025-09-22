@@ -1,6 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { InputProps } from '@/types';
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: string;
+  label?: string;
+}
 
 const Input: React.FC<InputProps> = ({
   className,
@@ -14,12 +18,6 @@ const Input: React.FC<InputProps> = ({
   disabled = false,
   ...props
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onChange) {
-      onChange(e.target.value);
-    }
-  };
-
   return (
     <div className="w-full">
       {label && (
@@ -40,8 +38,9 @@ const Input: React.FC<InputProps> = ({
         )}
         placeholder={placeholder}
         value={value}
-        onChange={handleChange}
+        onChange={onChange}
         disabled={disabled}
+        required={required}
         {...props}
       />
       
