@@ -65,8 +65,10 @@ export default function TestPage() {
             boxShadow: '0 4px 6px -1px rgba(5, 150, 105, 0.3)',
             transition: 'transform 0.2s',
           }}
-          onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
-          onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+          onMouseOver={(e) => (e.target as HTMLElement).style.transform = 'translateY(-2px)'}
+          onMouseOut={(e) => (e.target as HTMLElement).style.transform = 'translateY(0)'}
+          onFocus={(e) => (e.target as HTMLElement).style.transform = 'translateY(-2px)'}
+          onBlur={(e) => (e.target as HTMLElement).style.transform = 'translateY(0)'}
           >
             💰 Get Started
           </button>
@@ -83,12 +85,20 @@ export default function TestPage() {
             transition: 'all 0.2s',
           }}
           onMouseOver={(e) => {
-            e.target.style.background = '#ecfdf5';
-            e.target.style.transform = 'translateY(-2px)';
+            (e.target as HTMLElement).style.background = '#ecfdf5';
+            (e.target as HTMLElement).style.transform = 'translateY(-2px)';
           }}
           onMouseOut={(e) => {
-            e.target.style.background = 'white';
-            e.target.style.transform = 'translateY(0)';
+            (e.target as HTMLElement).style.background = 'white';
+            (e.target as HTMLElement).style.transform = 'translateY(0)';
+          }}
+          onFocus={(e) => {
+            (e.target as HTMLElement).style.background = '#ecfdf5';
+            (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+          }}
+          onBlur={(e) => {
+            (e.target as HTMLElement).style.background = 'white';
+            (e.target as HTMLElement).style.transform = 'translateY(0)';
           }}
           >
             🔐 Sign In
