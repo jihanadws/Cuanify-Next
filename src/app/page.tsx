@@ -1,333 +1,313 @@
-export default function HomePage() {'use client''use client''use client';
+﻿'use client'
+
+import { useRouter } from 'next/navigation'
+import AuthRedirectHandler from '@/components/AuthRedirectHandler'
+
+export default function HomePage() {
+  const router = useRouter()
+
+  const handleGetStarted = () => {
+    router.push('/auth/signup')
+  }
+
+  const handleSignIn = () => {
+    router.push('/auth/signin')
+  }
+
+  const buttonStylePrimary = {
+    display: 'inline-flex' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem 2rem',
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    color: 'white',
+    background: 'linear-gradient(135deg, #059669, #047857)',
+    border: 'none',
+    borderRadius: '1rem',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 15px rgba(5, 150, 105, 0.4)',
+    minWidth: '180px'
+  }
+
+  const buttonStyleSecondary = {
+    display: 'inline-flex' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem 2rem',
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    color: '#047857',
+    background: 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid #6ee7b7',
+    borderRadius: '1rem',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 15px rgba(110, 231, 183, 0.3)',
+    minWidth: '180px'
+  }
 
   return (
-
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-
-      <div className="text-center">
-
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">import { useEffect } from 'react'
-
+    <>
+      <AuthRedirectHandler />
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #ecfdf5 0%, #ffffff 50%, #eff6ff 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden'
+    }}>
+      {/* Background decorative elements */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          top: '-1rem',
+          right: '-1rem',
+          width: '18rem',
+          height: '18rem',
+          background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(59, 130, 246, 0.15))',
+          borderRadius: '50%',
+          filter: 'blur(3rem)'
+        }}></div>
+        <div style={{
+          position: 'absolute',
+          bottom: '-1rem',
+          left: '-1rem',
+          width: '18rem',
+          height: '18rem',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(52, 211, 153, 0.15))',
+          borderRadius: '50%',
+          filter: 'blur(3rem)'
+        }}></div>
+      </div>
+      
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        textAlign: 'center',
+        maxWidth: '64rem',
+        margin: '0 auto',
+        padding: '1.5rem 1rem'
+      }}>
+        {/* Logo */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '2rem'
+        }}>
+          <div style={{
+            width: '4rem',
+            height: '4rem',
+            background: 'linear-gradient(135deg, #059669, #2563eb)',
+            borderRadius: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 10px 25px rgba(5, 150, 105, 0.3)'
+          }}>
+            <span style={{
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '1.5rem'
+            }}>₿</span>
+          </div>
+        </div>
+        
+        {/* Main Title */}
+        <h1 style={{
+          fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+          fontWeight: 'bold',
+          background: 'linear-gradient(135deg, #047857, #2563eb, #047857)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          color: 'transparent',
+          marginBottom: '1.5rem',
+          lineHeight: '1.1'
+        }}>
           Cuanify
-
-        </h1>import { useSession } from 'next-auth/react'
-
-        <p className="text-xl text-gray-600 mb-8">
-
-          Aplikasi Pengelola Keuangan Pribadiimport { useRouter } from 'next/navigation'import { useEffect } from 'react'import React from 'react';
-
+        </h1>
+        
+        {/* Subtitle */}
+        <p style={{
+          fontSize: 'clamp(1.125rem, 3vw, 1.5rem)',
+          color: '#374151',
+          fontWeight: '500',
+          marginBottom: '1rem',
+          maxWidth: '42rem',
+          margin: '0 auto 1rem auto'
+        }}>
+          Kelola keuangan personal Anda dengan mudah dan efektif
         </p>
-
-        <div className="space-x-4">import Link from 'next/link'
-
-          <a 
-
-            href="/auth/signin"import Button from '@/components/ui/Button'import { useSession } from 'next-auth/react'import { DashboardLayout } from '@/components/layout';
-
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-
+        
+        {/* Description */}
+        <p style={{
+          fontSize: 'clamp(1rem, 2.5vw, 1.125rem)',
+          color: '#4b5563',
+          marginBottom: '3rem',
+          maxWidth: '36rem',
+          margin: '0 auto 3rem auto',
+          lineHeight: '1.6'
+        }}>
+          Platform manajemen keuangan modern yang membantu Anda mengatur budget, tracking pengeluaran, dan mencapai tujuan finansial
+        </p>
+        
+        {/* Buttons */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          justifyContent: 'center',
+          alignItems: 'center',
+          maxWidth: '28rem',
+          margin: '0 auto 4rem auto'
+        }}>
+          <button 
+            onClick={handleGetStarted}
+            style={buttonStylePrimary}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(5, 150, 105, 0.5)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(5, 150, 105, 0.4)'
+            }}
           >
-
-            Masuk
-
-          </a>export default function HomePage() {import { useRouter } from 'next/navigation'import { MetricCard, TransactionList } from '@/components/financial';
-
-          <a 
-
-            href="/auth/signup"  const { data: session, status } = useSession()
-
-            className="inline-block bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300"
-
-          >  const router = useRouter()import Link from 'next/link'import { 
-
-            Daftar
-
-          </a>
-
-        </div>
-
-      </div>  useEffect(() => {import Button from '@/components/ui/Button'  CurrencyDollarIcon, 
-
-    </div>
-
-  )    if (status === 'loading') return
-
-}
-  ArrowTrendingUpIcon, 
-
-    if (session) {
-
-      router.push('/dashboard')export default function HomePage() {  ArrowTrendingDownIcon,
-
-    }
-
-  }, [session, status, router])  const { data: session, status } = useSession()  WalletIcon 
-
-
-
-  if (status === 'loading') {  const router = useRouter()} from '@heroicons/react/24/outline';
-
-    return (
-
-      <div className="min-h-screen flex items-center justify-center">import { Transaction } from '@/types';
-
-        <div className="text-lg">Memuat...</div>
-
-      </div>  useEffect(() => {
-
-    )
-
-  }    if (status === 'loading') return// Sample data - nantinya akan diganti dengan data dari API
-
-
-
-  if (session) {const sampleTransactions: Transaction[] = [
-
-    return null
-
-  }    if (session) {  {
-
-
-
-  return (      router.push('/dashboard')    id: '1',
-
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-
-      <div className="container mx-auto px-4 py-16">    }    date: '2024-09-22',
-
-        <div className="text-center">
-
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">  }, [session, status, router])    description: 'Gaji Bulanan',
-
-            Cuanify
-
-          </h1>    amount: 8000000,
-
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-
-            Aplikasi pengelola keuangan pribadi yang memberikan kontrol penuh   if (status === 'loading') {    category: 'Gaji',
-
-            kepada Anda atas data finansial. Kelola keuangan dengan mudah, 
-
-            aman, dan privat.    return (    type: 'income',
-
-          </p>
-
-                <div className="min-h-screen flex items-center justify-center">  },
-
-          <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-
-            <Link href="/auth/signup">        <div className="text-lg">Memuat...</div>  {
-
-              <Button className="w-full sm:w-auto">
-
-                Mulai Sekarang      </div>    id: '2',
-
-              </Button>
-
-            </Link>    )    date: '2024-09-21',
-
-            <Link href="/auth/signin">
-
-              <Button variant="outline" className="w-full sm:w-auto">  }    description: 'Belanja Groceries',
-
-                Masuk
-
-              </Button>    amount: -450000,
-
-            </Link>
-
-          </div>  if (session) {    category: 'Makanan',
-
-        </div>
-
-    return null // Will redirect to dashboard    type: 'expense',
-
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-
-          <div className="text-center p-6">  }  },
-
-            <div className="text-4xl mb-4">🔐</div>
-
-            <h3 className="text-xl font-semibold mb-2">Aman & Privat</h3>  {
-
-            <p className="text-gray-600">
-
-              Data Anda disimpan dengan enkripsi dan hanya Anda yang bisa mengaksesnya  return (    id: '3',
-
-            </p>
-
-          </div>    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">    date: '2024-09-20',
-
+            💰 Get Started
+          </button>
           
-
-          <div className="text-center p-6">      <div className="container mx-auto px-4 py-16">    description: 'Bensin Motor',
-
-            <div className="text-4xl mb-4">📊</div>
-
-            <h3 className="text-xl font-semibold mb-2">Visualisasi Cerdas</h3>        <div className="text-center">    amount: -50000,
-
-            <p className="text-gray-600">
-
-              Lihat pengeluaran Anda dalam bentuk diagram dan laporan yang mudah dipahami          <h1 className="text-5xl font-bold text-gray-900 mb-6">    category: 'Transport',
-
-            </p>
-
-          </div>            Cuanify    type: 'expense',
-
-          
-
-          <div className="text-center p-6">          </h1>  },
-
-            <div className="text-4xl mb-4">🎯</div>
-
-            <h3 className="text-xl font-semibold mb-2">Budgeting & Goals</h3>          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">  {
-
-            <p className="text-gray-600">
-
-              Atur anggaran bulanan dan capai tujuan keuangan dengan fitur pelacakan            Aplikasi pengelola keuangan pribadi yang memberikan kontrol penuh     id: '4',
-
-            </p>
-
-          </div>            kepada Anda atas data finansial. Kelola keuangan dengan mudah,     date: '2024-09-19',
-
+          <button 
+            onClick={handleSignIn}
+            style={buttonStyleSecondary}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.background = '#ecfdf5'
+              e.currentTarget.style.borderColor = '#34d399'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)'
+              e.currentTarget.style.borderColor = '#6ee7b7'
+            }}
+          >
+            🔐 Sign In
+          </button>
         </div>
-
-      </div>            aman, dan privat.    description: 'Investasi Reksadana',
-
-    </div>
-
-  )          </p>    amount: -1000000,
-
-}
-              category: 'Investasi',
-
-          <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">    type: 'expense',
-
-            <Link href="/auth/signup">  },
-
-              <Button className="w-full sm:w-auto">  {
-
-                Mulai Sekarang    id: '5',
-
-              </Button>    date: '2024-09-18',
-
-            </Link>    description: 'Freelance Project',
-
-            <Link href="/auth/signin">    amount: 2500000,
-
-              <Button variant="outline" className="w-full sm:w-auto">    category: 'Gaji',
-
-                Masuk    type: 'income',
-
-              </Button>  },
-
-            </Link>];
-
-          </div>
-
-        </div>export default function HomePage() {
-
-  return (
-
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">    <DashboardLayout>
-
-          <div className="text-center p-6">      <div className="space-y-6">
-
-            <div className="text-4xl mb-4">🔐</div>        {/* Header */}
-
-            <h3 className="text-xl font-semibold mb-2">Aman & Privat</h3>        <div>
-
-            <p className="text-gray-600">          <h1 className="text-2xl font-bold text-gray-900">Dashboard Keuangan</h1>
-
-              Data Anda disimpan dengan enkripsi dan hanya Anda yang bisa mengaksesnya          <p className="text-gray-600">Ringkasan finansial Anda bulan ini</p>
-
-            </p>        </div>
-
-          </div>
-
-                  {/* Metrics Cards */}
-
-          <div className="text-center p-6">        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            <div className="text-4xl mb-4">📊</div>          <MetricCard
-
-            <h3 className="text-xl font-semibold mb-2">Visualisasi Cerdas</h3>            title="Total Saldo"
-
-            <p className="text-gray-600">            value={15750000}
-
-              Lihat pengeluaran Anda dalam bentuk diagram dan laporan yang mudah dipahami            previousValue={14200000}
-
-            </p>            formatAsCurrency={true}
-
-          </div>            icon={<WalletIcon className="h-6 w-6" />}
-
-                      color="blue"
-
-          <div className="text-center p-6">          />
-
-            <div className="text-4xl mb-4">🎯</div>          <MetricCard
-
-            <h3 className="text-xl font-semibold mb-2">Budgeting & Goals</h3>            title="Pendapatan Bulan Ini"
-
-            <p className="text-gray-600">            value={10500000}
-
-              Atur anggaran bulanan dan capai tujuan keuangan dengan fitur pelacakan            previousValue={8000000}
-
-            </p>            formatAsCurrency={true}
-
-          </div>            icon={<ArrowTrendingUpIcon className="h-6 w-6" />}
-
-        </div>            color="green"
-
-      </div>          />
-
-    </div>          <MetricCard
-
-  )            title="Pengeluaran Bulan Ini"
-
-}            value={3250000}
-            previousValue={4100000}
-            formatAsCurrency={true}
-            icon={<ArrowTrendingDownIcon className="h-6 w-6" />}
-            color="red"
-          />
-          <MetricCard
-            title="Net Worth"
-            value={7250000}
-            previousValue={3900000}
-            formatAsCurrency={true}
-            icon={<CurrencyDollarIcon className="h-6 w-6" />}
-            color="green"
-          />
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Transactions */}
-          <div className="lg:col-span-2">
-            <TransactionList transactions={sampleTransactions} maxItems={8} />
-          </div>
-
-          {/* Quick Actions or Summary */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                  Tambah Transaksi
-                </button>
-                <button className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                  Lihat Laporan
-                </button>
-                <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors">
-                  Atur Budget
-                </button>
-              </div>
+        
+        {/* Features Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
+          maxWidth: '80rem',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '1rem'
+          }}>
+            <div style={{
+              width: '4rem',
+              height: '4rem',
+              background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+              borderRadius: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem auto',
+              boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)'
+            }}>
+              <span style={{
+                color: 'white',
+                fontSize: '1.5rem'
+              }}>📊</span>
             </div>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '0.5rem'
+            }}>Budget Tracking</h3>
+            <p style={{
+              fontSize: '1rem',
+              color: '#4b5563',
+              lineHeight: '1.6'
+            }}>Pantau anggaran dan pengeluaran Anda secara real-time</p>
+          </div>
+          
+          <div style={{
+            textAlign: 'center',
+            padding: '1rem'
+          }}>
+            <div style={{
+              width: '4rem',
+              height: '4rem',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              borderRadius: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem auto',
+              boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)'
+            }}>
+              <span style={{
+                color: 'white',
+                fontSize: '1.5rem'
+              }}>📈</span>
+            </div>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '0.5rem'
+            }}>Smart Analytics</h3>
+            <p style={{
+              fontSize: '1rem',
+              color: '#4b5563',
+              lineHeight: '1.6'
+            }}>Analisis mendalam untuk keputusan finansial yang lebih baik</p>
+          </div>
+          
+          <div style={{
+            textAlign: 'center',
+            padding: '1rem'
+          }}>
+            <div style={{
+              width: '4rem',
+              height: '4rem',
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              borderRadius: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem auto',
+              boxShadow: '0 10px 25px rgba(245, 158, 11, 0.3)'
+            }}>
+              <span style={{
+                color: 'white',
+                fontSize: '1.5rem'
+              }}>🔒</span>
+            </div>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '0.5rem'
+            }}>Secure & Private</h3>
+            <p style={{
+              fontSize: '1rem',
+              color: '#4b5563',
+              lineHeight: '1.6'
+            }}>Data keuangan Anda aman dengan enkripsi tingkat bank</p>
           </div>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </div>
+    </>
+  )
 }

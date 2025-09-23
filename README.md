@@ -1,20 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cuanify - Financial Management Application
 
-## Getting Started
+A modern financial management application built with Next.js 15, Supabase, and TypeScript.
 
-First, run the development server:
+## Features
+
+- **Expense Tracking**: Track and categorize daily expenses
+- **Budget Management**: Set and monitor budgets for different categories
+- **Financial Goals**: Set and track progress towards savings goals
+- **Multi-Account Support**: Manage multiple bank accounts and wallets
+- **Transaction History**: Detailed transaction records with filtering
+- **Dashboard Analytics**: Visual insights into spending patterns
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 with App Router, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL database, Authentication, Real-time)
+- **UI Components**: Custom components with Tailwind CSS
+- **State Management**: Zustand
+- **Form Validation**: React Hook Form with Zod
+- **Charts**: Recharts
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd cuanify-next
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up Supabase
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to Project Settings > API
+3. Copy your project URL and anon public key
+
+### 4. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
+
+### 5. Set up Database Schema
+
+1. Go to your Supabase dashboard
+2. Navigate to SQL Editor
+3. Copy and paste the contents of `supabase/schema.sql`
+4. Run the SQL script to create all tables, policies, and default data
+
+### 6. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
