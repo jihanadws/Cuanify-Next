@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { handleDatabaseError } from '@/lib/database-utils'
+import { getUserCategories, type Category } from '@/lib/categories'
 import type { User } from '@supabase/supabase-js'
 
 export default function AddTransactionPage() {
@@ -13,10 +14,11 @@ export default function AddTransactionPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [categories, setCategories] = useState<Category[]>([])
   
   const [formData, setFormData] = useState({
-    type: 'expense',
-    category: 'makanan',
+    type: 'EXPENSE' as 'EXPENSE' | 'INCOME',
+    category_id: '',
     amount: '',
     description: '',
     account: 'cash',
@@ -25,11 +27,6 @@ export default function AddTransactionPage() {
   
   const router = useRouter()
   const supabase = createClient()
-
-  const categories = {
-    expense: ['makanan', 'transportasi', 'belanja', 'hiburan', 'kesehatan', 'pendidikan', 'tagihan', 'lainnya'],
-    income: ['gaji', 'bonus', 'investasi', 'lainnya']
-  }
 
   const accounts = [
     { value: 'cash', label: 'Kas/Tunai' },
@@ -41,6 +38,7 @@ export default function AddTransactionPage() {
     { value: 'ewallet_dana', label: 'DANA' }
   ]
 
+  // Fetch categories and set user
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -48,7 +46,20 @@ export default function AddTransactionPage() {
       setLoading(false)
       
       if (!user) {
-        router.push('/auth/login')
+        router.push('/auth/signin')
+      } else {
+        // Fetch user categories
+        const userCategories = await getUserCategories(user.id)
+        setCategories(userCategories)
+        
+        // Set default category
+        const expenseCategories = userCategories.filter(cat => cat.type === 'EXPENSE')
+        if (expenseCategories.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            category_id: expenseCategories[0].id
+          }))
+        }
       }
     }
 
@@ -64,12 +75,20 @@ export default function AddTransactionPage() {
 
     // Reset category when type changes
     if (name === 'type') {
-      setFormData(prev => ({
-        ...prev,
-        category: categories[value as keyof typeof categories][0]
-      }))
+      const filteredCategories = categories.filter(cat => cat.type === value)
+      if (filteredCategories.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          category_id: filteredCategories[0].id
+        }))
+      }
     }
   }
+
+  // Filter categories based on transaction type
+  const filteredCategories = categories.filter(category => 
+    category.type === formData.type
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,7 +114,7 @@ export default function AddTransactionPage() {
           {
             user_id: user.id,
             type: formData.type,
-            category: formData.category,
+            category_id: formData.category_id,
             amount: amount,
             description: formData.description,
             account: formData.account,
@@ -268,15 +287,16 @@ export default function AddTransactionPage() {
             <form onSubmit={handleSubmit}>
               {/* Type Selection */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
-                  Jenis Transaksi
-                </label>
+                <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+                  <legend style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}>
+                    Jenis Transaksi
+                  </legend>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -284,13 +304,13 @@ export default function AddTransactionPage() {
                 }}>
                   <button
                     type="button"
-                    onClick={() => handleInputChange({ target: { name: 'type', value: 'income' } } as React.ChangeEvent<HTMLInputElement>)}
+                    onClick={() => handleInputChange({ target: { name: 'type', value: 'INCOME' } } as React.ChangeEvent<HTMLInputElement>)}
                     style={{
                       padding: '0.75rem',
                       borderRadius: '0.5rem',
-                      border: formData.type === 'income' ? '2px solid #10b981' : '1px solid #d1d5db',
-                      backgroundColor: formData.type === 'income' ? '#f0fdf4' : 'white',
-                      color: formData.type === 'income' ? '#065f46' : '#374151',
+                      border: formData.type === 'INCOME' ? '2px solid #10b981' : '1px solid #d1d5db',
+                      backgroundColor: formData.type === 'INCOME' ? '#f0fdf4' : 'white',
+                      color: formData.type === 'INCOME' ? '#065f46' : '#374151',
                       cursor: 'pointer',
                       fontSize: '1rem',
                       fontWeight: '500',
@@ -301,13 +321,13 @@ export default function AddTransactionPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleInputChange({ target: { name: 'type', value: 'expense' } } as React.ChangeEvent<HTMLInputElement>)}
+                    onClick={() => handleInputChange({ target: { name: 'type', value: 'EXPENSE' } } as React.ChangeEvent<HTMLInputElement>)}
                     style={{
                       padding: '0.75rem',
                       borderRadius: '0.5rem',
-                      border: formData.type === 'expense' ? '2px solid #ef4444' : '1px solid #d1d5db',
-                      backgroundColor: formData.type === 'expense' ? '#fef2f2' : 'white',
-                      color: formData.type === 'expense' ? '#7f1d1d' : '#374151',
+                      border: formData.type === 'EXPENSE' ? '2px solid #ef4444' : '1px solid #d1d5db',
+                      backgroundColor: formData.type === 'EXPENSE' ? '#fef2f2' : 'white',
+                      color: formData.type === 'EXPENSE' ? '#7f1d1d' : '#374151',
                       cursor: 'pointer',
                       fontSize: '1rem',
                       fontWeight: '500',
@@ -317,17 +337,21 @@ export default function AddTransactionPage() {
                     💸 Pengeluaran
                   </button>
                 </div>
+                </fieldset>
               </div>
 
               {/* Amount */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
+                <label 
+                  htmlFor="amount"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}
+                >
                   Jumlah
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -343,6 +367,7 @@ export default function AddTransactionPage() {
                     Rp
                   </span>
                   <input
+                    id="amount"
                     type="text"
                     value={formatCurrency(formData.amount)}
                     onChange={handleAmountChange}
@@ -370,18 +395,22 @@ export default function AddTransactionPage() {
 
               {/* Category */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
+                <label 
+                  htmlFor="category_id"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}
+                >
                   Kategori
                 </label>
                 <select
-                  name="category"
-                  value={formData.category}
+                  id="category_id"
+                  name="category_id"
+                  value={formData.category_id}
                   onChange={handleInputChange}
                   style={{
                     width: '100%',
@@ -402,9 +431,10 @@ export default function AddTransactionPage() {
                   }}
                   required
                 >
-                  {categories[formData.type as keyof typeof categories].map((category) => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                  <option value="">Pilih Kategori</option>
+                  {filteredCategories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.icon} {category.name}
                     </option>
                   ))}
                 </select>
@@ -412,16 +442,20 @@ export default function AddTransactionPage() {
 
               {/* Description */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
+                <label 
+                  htmlFor="description"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}
+                >
                   Deskripsi
                 </label>
                 <textarea
+                  id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
@@ -451,16 +485,20 @@ export default function AddTransactionPage() {
 
               {/* Account */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
+                <label 
+                  htmlFor="account"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}
+                >
                   Akun
                 </label>
                 <select
+                  id="account"
                   name="account"
                   value={formData.account}
                   onChange={handleInputChange}
@@ -493,16 +531,20 @@ export default function AddTransactionPage() {
 
               {/* Date */}
               <div style={{ marginBottom: '2rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
+                <label 
+                  htmlFor="date"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.5rem'
+                  }}
+                >
                   Tanggal
                 </label>
                 <input
+                  id="date"
                   type="date"
                   name="date"
                   value={formData.date}
@@ -553,6 +595,16 @@ export default function AddTransactionPage() {
                   }
                 }}
                 onMouseOut={(e) => {
+                  if (!submitting) {
+                    e.currentTarget.style.backgroundColor = '#3b82f6'
+                  }
+                }}
+                onFocus={(e) => {
+                  if (!submitting) {
+                    e.currentTarget.style.backgroundColor = '#2563eb'
+                  }
+                }}
+                onBlur={(e) => {
                   if (!submitting) {
                     e.currentTarget.style.backgroundColor = '#3b82f6'
                   }
