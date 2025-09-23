@@ -97,7 +97,11 @@ export default function CategoriesPage() {
     getUser()
   }, [router, supabase, fetchCategories])
 
-  const createUserIfNotExists = async (user: any): Promise<boolean> => {
+  const createUserIfNotExists = async (user: { 
+    id: string; 
+    email?: string; 
+    user_metadata?: { name?: string } 
+  }): Promise<boolean> => {
     try {
       // Try to create user record dengan upsert approach
       const { error } = await supabase

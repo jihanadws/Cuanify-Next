@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { User, Session } from '@supabase/supabase-js'
 
 export default function DebugAuthPage() {
-  const [user, setUser] = useState<any>(null)
-  const [session, setSession] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   const supabase = createClient()
@@ -82,7 +83,7 @@ export default function DebugAuthPage() {
           <li>Set Site URL to: <code>http://localhost:3002</code></li>
           <li>Add to Redirect URLs: <code>http://localhost:3002/auth/confirm</code></li>
           <li>Go to Authentication → Email Templates</li>
-          <li>Update "Confirm signup" template link to: <code>{'{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email'}</code></li>
+          <li>Update &quot;Confirm signup&quot; template link to: <code>{`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`}</code></li>
         </ol>
       </div>
     </div>

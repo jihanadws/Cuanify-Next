@@ -3,8 +3,28 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+interface DebugInfo {
+  currentUrl?: string
+  host?: string
+  pathname?: string
+  search?: string
+  urlParams?: Record<string, string>
+  timestamp?: string
+  envUrl?: string
+  supabaseUrl?: string
+  currentSession?: {
+    user?: string
+    expires?: string
+  } | null
+  sessionError?: string
+  signUpError?: string
+  signUpCode?: number
+  signUpSuccess?: boolean
+  signUpData?: unknown
+}
+
 export default function DebugAuthPage() {
-  const [debugInfo, setDebugInfo] = useState<any>({})
+  const [debugInfo, setDebugInfo] = useState<DebugInfo>({})
   const [emailSent, setEmailSent] = useState(false)
   const [testEmail, setTestEmail] = useState('')
   const supabase = createClient()
@@ -12,7 +32,7 @@ export default function DebugAuthPage() {
   useEffect(() => {
     // Dapatkan URL parameters
     const urlParams = new URLSearchParams(window.location.search)
-    const debugData = {
+    const debugData: DebugInfo = {
       currentUrl: window.location.href,
       host: window.location.host,
       pathname: window.location.pathname,
@@ -24,12 +44,15 @@ export default function DebugAuthPage() {
     }
 
     // Cek session saat ini
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }: {
+      data: { session: unknown }
+      error: unknown
+    }) => {
       debugData.currentSession = session ? {
-        user: session.user?.email,
-        expires: session.expires_at
+        user: (session as { user?: { email?: string } }).user?.email,
+        expires: (session as { expires_at?: number }).expires_at?.toString()
       } : null
-      debugData.sessionError = error?.message
+      debugData.sessionError = (error as { message?: string })?.message
 
       setDebugInfo(debugData)
     })

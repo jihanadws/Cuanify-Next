@@ -54,7 +54,7 @@ export default function DatabaseTestPage() {
           error: profilesError?.message,
           accessible: Array.isArray(profilesData)
         }
-      } catch (error) {
+      } catch (_error) {
         testResults.profiles = { exists: false, error: 'Table check failed' }
       }
 
@@ -70,7 +70,7 @@ export default function DatabaseTestPage() {
           error: transactionsError?.message,
           accessible: Array.isArray(transactionsData)
         }
-      } catch (error) {
+      } catch (_error) {
         testResults.transactions = { exists: false, error: 'Table check failed' }
       }
 
@@ -86,7 +86,7 @@ export default function DatabaseTestPage() {
           error: accountsError?.message,
           accessible: Array.isArray(accountsData)
         }
-      } catch (error) {
+      } catch (_error) {
         testResults.accounts = { exists: false, error: 'Table check failed' }
       }
 
@@ -102,7 +102,7 @@ export default function DatabaseTestPage() {
           error: budgetsError?.message,
           accessible: Array.isArray(budgetsData)
         }
-      } catch (error) {
+      } catch (_error) {
         testResults.budgets = { exists: false, error: 'Table check failed' }
       }
 
@@ -123,7 +123,7 @@ export default function DatabaseTestPage() {
             userId: user.id,
             userEmail: user.email
           }
-        } catch (error) {
+        } catch (_error) {
           testResults.userProfile = { exists: false, error: 'User profile check failed' }
         }
       } else {
@@ -131,7 +131,7 @@ export default function DatabaseTestPage() {
       }
 
       setResults(testResults)
-    } catch (error) {
+    } catch (error: unknown) {
       handleDatabaseError(error, 'database test')
     } finally {
       setLoading(false)
@@ -162,7 +162,7 @@ export default function DatabaseTestPage() {
         alert('Test account created successfully!')
         testDatabaseConnection() // Refresh results
       }
-    } catch (error) {
+    } catch (error: unknown) {
       handleDatabaseError(error, 'create test account')
     }
   }
@@ -194,7 +194,7 @@ export default function DatabaseTestPage() {
         alert('Test transaction created successfully!')
         testDatabaseConnection() // Refresh results
       }
-    } catch (error) {
+    } catch (error: unknown) {
       handleDatabaseError(error, 'create test transaction')
     }
   }

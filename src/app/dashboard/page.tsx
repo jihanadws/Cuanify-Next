@@ -19,17 +19,9 @@ interface Transaction {
   updated_at: string
 }
 
-interface Account {
-  id: string
-  name: string
-  type: string
-  balance: number
-}
-
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [_accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
@@ -60,14 +52,7 @@ export default function DashboardPage() {
           .select('*')
           .eq('user_id', user.id)
 
-        // Fetch accounts
-        const { data: accountsData } = await supabase
-          .from('accounts')
-          .select('*')
-          .eq('user_id', user.id)
-
         setTransactions(transactionsData || [])
-        setAccounts(accountsData || [])
       }
       
       setLoading(false)
