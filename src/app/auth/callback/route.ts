@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     code: !!code
   })
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     // Jika ada token_hash dan type, redirect ke halaman konfirmasi
@@ -63,10 +63,16 @@ export async function GET(request: NextRequest) {
     if (code) {
       console.log('Exchanging code for session')
       
+      // Untuk PKCE flow, kita perlu server-side client
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) {
         console.error('Error exchanging code:', error)
+        // Jika PKCE gagal, coba redirect kembali dengan parameter yang ada
+        if (error.message?.includes('code verifier')) {
+          // Redirect ke halaman konfirmasi manual jika diperlukan
+          return NextResponse.redirect(new URL('/auth/signin?error=pkce_required', request.url))
+        }
         return NextResponse.redirect(new URL('/auth/signin?error=code_exchange_error', request.url))
       }
 

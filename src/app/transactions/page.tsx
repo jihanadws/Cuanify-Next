@@ -4,22 +4,26 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
+import { type Category } from '@/lib/categories'
 
 interface Transaction {
   id: string
   amount: number
   description: string
-  type: 'income' | 'expense'
-  category: string
+  type: 'INCOME' | 'EXPENSE'
+  category_id: string
+  account: string
+  date: string
   created_at: string
   user_id: string
+  categories?: Category
 }
 
 export default function TransactionsPage() {
   const router = useRouter()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'income' | 'expense'>('all')
+  const [filter, setFilter] = useState<'all' | 'INCOME' | 'EXPENSE'>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -36,7 +40,16 @@ export default function TransactionsPage() {
 
       const { data, error } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          *,
+          categories (
+            id,
+            name,
+            icon,
+            color,
+            type
+          )
+        `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -87,7 +100,7 @@ export default function TransactionsPage() {
     if (searchTerm) {
       filtered = filtered.filter(t => 
         t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.category.toLowerCase().includes(searchTerm.toLowerCase())
+        (t.categories?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
@@ -118,23 +131,6 @@ export default function TransactionsPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
-  }
-
-  const getCategoryIcon = (category: string) => {
-    const icons: { [key: string]: string } = {
-      'makanan': '🍽️',
-      'transportasi': '🚗',
-      'belanja': '🛒',
-      'hiburan': '🎬',
-      'kesehatan': '🏥',
-      'pendidikan': '📚',
-      'tagihan': '📄',
-      'gaji': '💰',
-      'bonus': '🎁',
-      'investasi': '📈',
-      'lainnya': '📦'
-    }
-    return icons[category.toLowerCase()] || '📦'
   }
 
   if (loading) {
@@ -229,7 +225,10 @@ export default function TransactionsPage() {
             <span style={{
               fontSize: '1.2rem',
               lineHeight: 1
-            }}>+</span>
+            }}>
+              +
+            </span>
+            {' '}
             Tambah Transaksi
           </button>
         </div>
@@ -315,12 +314,12 @@ export default function TransactionsPage() {
           }}>
             {[
               { key: 'all', label: 'Semua' },
-              { key: 'income', label: 'Pemasukan' },
-              { key: 'expense', label: 'Pengeluaran' }
+              { key: 'INCOME', label: 'Pemasukan' },
+              { key: 'EXPENSE', label: 'Pengeluaran' }
             ].map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => setFilter(key as 'all' | 'income' | 'expense')}
+                onClick={() => setFilter(key as 'all' | 'INCOME' | 'EXPENSE')}
                 style={{
                   padding: '0.5rem 1rem',
                   border: filter === key ? 'none' : '1px solid #d1d5db',
@@ -368,7 +367,7 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'income')
+                  .filter(t => t.type === 'INCOME')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -396,7 +395,7 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'expense')
+                  .filter(t => t.type === 'EXPENSE')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -424,10 +423,10 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'income')
+                  .filter(t => t.type === 'INCOME')
                   .reduce((sum, t) => sum + t.amount, 0) -
                 transactions
-                  .filter(t => t.type === 'expense')
+                  .filter(t => t.type === 'EXPENSE')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -470,10 +469,11 @@ export default function TransactionsPage() {
                 color: '#6b7280',
                 marginBottom: '0.5rem'
               }}>
-                {filter === 'all' 
-                  ? 'Belum ada transaksi' 
-                  : `Belum ada transaksi ${filter === 'income' ? 'pemasukan' : 'pengeluaran'}`
-                }
+                {(() => {
+                  if (filter === 'all') return 'Belum ada transaksi'
+                  if (filter === 'INCOME') return 'Belum ada transaksi pemasukan'
+                  return 'Belum ada transaksi pengeluaran'
+                })()}
               </div>
               <div style={{
                 fontSize: '0.875rem',
@@ -483,9 +483,15 @@ export default function TransactionsPage() {
               </div>
             </div>
           ) : (
-            <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+            <ul style={{ 
+              maxHeight: '60vh', 
+              overflowY: 'auto',
+              listStyle: 'none',
+              padding: 0,
+              margin: 0
+            }}>
               {filteredTransactions.map((transaction, index) => (
-                <div
+                <li
                   key={transaction.id}
                   style={{
                     padding: '1rem 1.5rem',
@@ -493,14 +499,7 @@ export default function TransactionsPage() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    cursor: 'pointer',
                     transition: 'background-color 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f9fafb'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'white'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -508,7 +507,7 @@ export default function TransactionsPage() {
                       fontSize: '2rem',
                       lineHeight: 1
                     }}>
-                      {getCategoryIcon(transaction.category)}
+                      {transaction.categories?.icon || '📄'}
                     </div>
                     <div>
                       <div style={{
@@ -523,7 +522,7 @@ export default function TransactionsPage() {
                         fontSize: '0.875rem',
                         color: '#6b7280'
                       }}>
-                        {transaction.category} • {formatDate(transaction.created_at)}
+                        {transaction.categories?.name || 'Lainnya'} • {formatDate(transaction.date || transaction.created_at)}
                       </div>
                     </div>
                   </div>
@@ -536,9 +535,9 @@ export default function TransactionsPage() {
                     <div style={{
                       fontSize: '1rem',
                       fontWeight: 'bold',
-                      color: transaction.type === 'income' ? '#10b981' : '#ef4444'
+                      color: transaction.type === 'INCOME' ? '#10b981' : '#ef4444'
                     }}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </div>
                     <button
                       onClick={(e) => {
@@ -564,13 +563,20 @@ export default function TransactionsPage() {
                       onMouseOut={(e) => {
                         e.currentTarget.style.backgroundColor = '#fee2e2'
                       }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fecaca'
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fee2e2'
+                      }}
+                      aria-label="Hapus transaksi"
                     >
                       🗑️
                     </button>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </div>

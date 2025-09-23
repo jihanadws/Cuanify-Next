@@ -85,5 +85,16 @@ export const handleDatabaseError = (error: unknown, operation: string) => {
     logDatabaseSetupInstructions()
   }
   
+  // Check if it's a foreign key constraint violation
+  if (errorObj.code === '23503') {
+    console.error('🚨 Foreign key constraint violation detected!')
+    
+    if (typeof errorObj.message === 'string' && errorObj.message.includes('categories_user_id_fkey')) {
+      return 'Authentication error: User session may be invalid. Please log out and log back in.'
+    }
+    
+    return 'Database constraint violation: Referenced record not found.'
+  }
+  
   return `Failed to ${operation}: ${errorInfo.message}`
 }
