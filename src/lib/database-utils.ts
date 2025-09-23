@@ -25,7 +25,7 @@ export const logDatabaseSetupInstructions = () => {
   console.groupEnd();
 }
 
-export const handleDatabaseError = (error: any, operation: string) => {
+export const handleDatabaseError = (error: unknown, operation: string) => {
   // Handle case where error might be null, undefined, or not a proper error object
   if (!error) {
     console.error(`Error ${operation}: No error object provided`)
@@ -37,40 +37,53 @@ export const handleDatabaseError = (error: any, operation: string) => {
   
   // Enhanced error inspection for objects that appear empty
   console.error(`Error ${operation} - Error type:`, typeof error)
-  console.error(`Error ${operation} - Error constructor:`, error.constructor?.name)
-  console.error(`Error ${operation} - Error toString:`, error.toString())
+  console.error(`Error ${operation} - Error constructor:`, (error as Record<string, unknown>).constructor?.name)
+  
+  // Safe toString
+  try {
+    if (error instanceof Error) {
+      console.error(`Error ${operation} - Error toString:`, error.toString())
+    } else {
+      console.error(`Error ${operation} - Error toString:`, JSON.stringify(error))
+    }
+  } catch {
+    console.error(`Error ${operation} - Error toString: <unable to stringify>`)
+  }
   
   // Check for all possible properties including non-enumerable ones
-  const allProps = Object.getOwnPropertyNames(error)
-  console.error(`Error ${operation} - All properties:`, allProps)
+  if (typeof error === 'object' && error !== null) {
+    const allProps = Object.getOwnPropertyNames(error)
+    console.error(`Error ${operation} - All properties:`, allProps)
+    
+    // Log each property value
+    allProps.forEach(prop => {
+      try {
+        console.error(`Error ${operation} - ${prop}:`, (error as Record<string, unknown>)[prop])
+      } catch {
+        console.error(`Error ${operation} - ${prop}: <inaccessible>`)
+      }
+    })
+  }
   
-  // Log each property value
-  allProps.forEach(prop => {
-    try {
-      console.error(`Error ${operation} - ${prop}:`, error[prop])
-    } catch (e) {
-      console.error(`Error ${operation} - ${prop}: <inaccessible>`)
-    }
-  })
-  
-  // Try to extract meaningful information
+  // Try to extract meaningful information with type guards
+  const errorObj = error as Record<string, unknown>
   const errorInfo = {
-    message: error?.message || 'Unknown error',
-    details: error?.details || 'No details available',
-    hint: error?.hint || 'No hint available',
-    code: error?.code || 'No error code'
+    message: (typeof errorObj.message === 'string' ? errorObj.message : 'Unknown error'),
+    details: (typeof errorObj.details === 'string' ? errorObj.details : 'No details available'),
+    hint: (typeof errorObj.hint === 'string' ? errorObj.hint : 'No hint available'),
+    code: (typeof errorObj.code === 'string' ? errorObj.code : 'No error code')
   }
   
   console.error(`Error ${operation} - Parsed:`, errorInfo)
   
   // Check if it's a table doesn't exist error
-  if (error?.code === '42P01' || 
-      error?.message?.includes('relation') || 
-      error?.message?.includes('does not exist') ||
-      error?.message?.includes('table')) {
+  if (errorObj.code === '42P01' || 
+      (typeof errorObj.message === 'string' && errorObj.message.includes('relation')) || 
+      (typeof errorObj.message === 'string' && errorObj.message.includes('does not exist')) ||
+      (typeof errorObj.message === 'string' && errorObj.message.includes('table'))) {
     console.error('🚨 Database table missing detected!')
     logDatabaseSetupInstructions()
   }
   
-  return `Failed to ${operation}: ${errorInfo.message || error?.message || 'Unknown error'}`
+  return `Failed to ${operation}: ${errorInfo.message}`
 }

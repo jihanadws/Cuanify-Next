@@ -278,7 +278,7 @@ export default function SignInPage() {
 
         <div style={{ marginTop: '2rem', textAlign: 'center' }}>
           <p style={{ fontSize: '0.875rem', color: '#374151' }}>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" style={{
               fontWeight: '600',
               color: '#047857',

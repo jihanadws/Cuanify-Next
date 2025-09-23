@@ -7,10 +7,29 @@ import ResponsiveLayout from '@/components/ResponsiveLayout'
 import EmailVerificationBanner from '@/components/EmailVerificationBanner'
 import type { User } from '@supabase/supabase-js'
 
+interface Transaction {
+  id: string
+  type: 'income' | 'expense'
+  category: string
+  amount: number
+  description: string
+  account: string
+  date: string
+  created_at: string
+  updated_at: string
+}
+
+interface Account {
+  id: string
+  name: string
+  type: string
+  balance: number
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [accounts, setAccounts] = useState<any[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [_accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)

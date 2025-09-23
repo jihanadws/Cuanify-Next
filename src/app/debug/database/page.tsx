@@ -3,11 +3,26 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { handleDatabaseError } from '@/lib/database-utils'
+import type { User } from '@supabase/supabase-js'
+
+interface TestResult {
+  exists: boolean
+  accessible?: boolean
+  error?: string
+  data?: Record<string, unknown>
+  emailConfirmed?: boolean
+  userId?: string
+  userEmail?: string
+}
+
+interface TestResults {
+  [key: string]: TestResult
+}
 
 export default function DatabaseTestPage() {
-  const [results, setResults] = useState<any>({})
+  const [results, setResults] = useState<TestResults>({})
   const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   
   const supabase = createClient()
 
@@ -21,7 +36,7 @@ export default function DatabaseTestPage() {
 
   const testDatabaseConnection = async () => {
     setLoading(true)
-    const testResults: any = {}
+    const testResults: TestResults = {}
 
     try {
       // Test database tables directly
@@ -130,7 +145,7 @@ export default function DatabaseTestPage() {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('accounts')
         .insert({
           user_id: user.id,
@@ -159,7 +174,7 @@ export default function DatabaseTestPage() {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('transactions')
         .insert({
           user_id: user.id,
@@ -238,7 +253,7 @@ export default function DatabaseTestPage() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-slate-800">Test Results</h2>
               
-              {Object.entries(results).map(([table, result]: [string, any]) => (
+              {Object.entries(results).map(([table, result]: [string, TestResult]) => (
                 <div key={table} className="p-4 bg-slate-50 rounded-lg">
                   <h3 className="text-lg font-semibold text-slate-700 mb-2">
                     {table.charAt(0).toUpperCase() + table.slice(1)} Table

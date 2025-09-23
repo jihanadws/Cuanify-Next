@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
@@ -43,23 +43,7 @@ export default function AccountsPage() {
     { value: 'credit', label: 'Credit Card', icon: '💳' }
   ]
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
-      
-      if (!user) {
-        router.push('/auth/login')
-      } else {
-        fetchAccounts(user.id)
-      }
-    }
-
-    getUser()
-  }, [router, supabase])
-
-  const fetchAccounts = async (userId: string) => {
+  const fetchAccounts = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('accounts')
@@ -75,7 +59,23 @@ export default function AccountsPage() {
     } catch (error) {
       console.error('Error:', error)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
+      
+      if (!user) {
+        router.push('/auth/login')
+      } else {
+        fetchAccounts(user.id)
+      }
+    }
+
+    getUser()
+  }, [router, supabase, fetchAccounts])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

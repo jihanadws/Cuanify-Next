@@ -284,7 +284,7 @@ export default function AddTransactionPage() {
                 }}>
                   <button
                     type="button"
-                    onClick={() => handleInputChange({ target: { name: 'type', value: 'income' } } as any)}
+                    onClick={() => handleInputChange({ target: { name: 'type', value: 'income' } } as React.ChangeEvent<HTMLInputElement>)}
                     style={{
                       padding: '0.75rem',
                       borderRadius: '0.5rem',
@@ -301,7 +301,7 @@ export default function AddTransactionPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleInputChange({ target: { name: 'type', value: 'expense' } } as any)}
+                    onClick={() => handleInputChange({ target: { name: 'type', value: 'expense' } } as React.ChangeEvent<HTMLInputElement>)}
                     style={{
                       padding: '0.75rem',
                       borderRadius: '0.5rem',
