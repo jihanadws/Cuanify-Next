@@ -11,7 +11,19 @@ export async function createClient() {
     const mockClient = {
       auth: {
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-        signOut: () => Promise.resolve({ error: null })
+        signOut: () => Promise.resolve({ error: null }),
+        signUp: () => Promise.resolve({ 
+          data: { user: null, session: null }, 
+          error: { message: 'Supabase not configured. Please add environment variables.' } 
+        }),
+        signInWithPassword: () => Promise.resolve({ 
+          data: { user: null, session: null }, 
+          error: { message: 'Supabase not configured. Please add environment variables.' } 
+        }),
+        verifyOtp: () => Promise.resolve({ 
+          data: { user: null, session: null }, 
+          error: { message: 'Supabase not configured. Please add environment variables.' } 
+        })
       },
       from: () => {
         const mockQuery = {
