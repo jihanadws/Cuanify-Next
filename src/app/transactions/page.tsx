@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
-import type { User } from '@supabase/supabase-js'
 
 interface Transaction {
   id: string
@@ -26,11 +25,7 @@ export default function TransactionsPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchTransactions()
-  }, [])
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       
@@ -55,7 +50,11 @@ export default function TransactionsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase, router])
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
 
   const deleteTransaction = async (id: string) => {
     if (!confirm('Yakin ingin menghapus transaksi ini?')) return

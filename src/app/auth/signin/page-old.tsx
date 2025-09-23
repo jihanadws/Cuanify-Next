@@ -33,7 +33,7 @@ export default function SignInPage() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch (error) {
+    } catch {
       setError('Terjadi kesalahan saat login')
     } finally {
       setLoading(false)

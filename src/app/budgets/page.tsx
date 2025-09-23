@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
@@ -54,24 +54,7 @@ export default function BudgetPage() {
     { value: 'yearly', label: 'Tahunan', days: 365 }
   ]
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
-      
-      if (!user) {
-        router.push('/auth/login')
-      } else {
-        fetchBudgets(user.id)
-        fetchTransactions(user.id)
-      }
-    }
-
-    getUser()
-  }, [router, supabase])
-
-  const fetchBudgets = async (userId: string) => {
+  const fetchBudgets = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('budgets')
@@ -90,9 +73,9 @@ export default function BudgetPage() {
       console.error('Unexpected error fetching budgets:', error)
       setError('An unexpected error occurred while fetching budgets')
     }
-  }
+  }, [supabase])
 
-  const fetchTransactions = async (userId: string) => {
+  const fetchTransactions = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('transactions')
@@ -112,7 +95,24 @@ export default function BudgetPage() {
       console.error('Unexpected error fetching transactions:', error)
       setError('An unexpected error occurred while fetching transactions')
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
+      
+      if (!user) {
+        router.push('/auth/login')
+      } else {
+        fetchBudgets(user.id)
+        fetchTransactions(user.id)
+      }
+    }
+
+    getUser()
+  }, [router, supabase, fetchBudgets, fetchTransactions])
 
   const calculateSpent = (budget: Budget) => {
     const startDate = new Date(budget.start_date)

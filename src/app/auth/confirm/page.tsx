@@ -47,7 +47,7 @@ export default function EmailConfirmationPage() {
       console.log('Using verifyOtp with token_hash')
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash,
-        type: type as any
+        type: type as 'signup' | 'invite' | 'recovery' | 'email_change'
       })
 
       console.log('Verification result:', { data, error })

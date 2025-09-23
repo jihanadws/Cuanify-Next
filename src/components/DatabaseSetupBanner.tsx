@@ -103,7 +103,7 @@ export default function DatabaseSetupBanner({ show }: DatabaseSetupBannerProps) 
             margin: '0 0 1rem 0',
             lineHeight: '1.4'
           }}>
-            The database tables haven't been created yet. You need to run the SQL migration script in your Supabase dashboard to use all features.
+            The database tables haven&apos;t been created yet. You need to run the SQL migration script in your Supabase dashboard to use all features.
           </p>
           
           <div style={{
