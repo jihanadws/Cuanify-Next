@@ -91,7 +91,7 @@ export default function AddTransactionPage() {
   )
 
   // Utility function to ensure user has required data
-  const ensureUserData = async (user: any) => {
+  const ensureUserData = async (user: { id: string; email?: string; user_metadata?: { name?: string } }) => {
     try {
       // Ensure user exists in users table
       const { data: existingUser } = await supabase
@@ -125,7 +125,7 @@ export default function AddTransactionPage() {
 
       if (!userAccounts || userAccounts.length === 0) {
         // Try with currency column first
-        let { error: accountError } = await supabase
+        const { error: accountError } = await supabase
           .from('accounts')
           .insert([{
             user_id: user.id,

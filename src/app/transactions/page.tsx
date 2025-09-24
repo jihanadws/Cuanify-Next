@@ -44,7 +44,7 @@ export default function TransactionsPage() {
       await ensureUserExists(user)
 
       // First try to fetch with category relation
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('transactions')
         .select(`
           *,
@@ -79,18 +79,32 @@ export default function TransactionsPage() {
             .select('*')
           
           // Map categories to transactions and normalize data
-          const transactionsWithCategories = (simpleQuery.data || []).map((transaction: any) => ({
+          const transactionsWithCategories = (simpleQuery.data || []).map((transaction: { 
+            id: string; 
+            amount: number; 
+            description: string; 
+            type?: string; 
+            category_id?: string; 
+            created_at: string 
+          }) => ({
             ...transaction,
             // Normalize transaction type to uppercase for consistency
             type: transaction.type?.toUpperCase() || 'EXPENSE',
-            categories: categoriesData?.find((cat: any) => cat.id === transaction.category_id) || null
+            categories: categoriesData?.find((cat: { id: string; name: string; icon: string; color: string }) => cat.id === transaction.category_id) || null
           }))
           
           setTransactions(transactionsWithCategories)
         }
       } else {
         // Normalize transaction types from main query too
-        const normalizedData = (data || []).map((transaction: any) => ({
+        const normalizedData = (data || []).map((transaction: { 
+          id: string; 
+          amount: number; 
+          description: string; 
+          type?: string; 
+          categories: unknown; 
+          created_at: string 
+        }) => ({
           ...transaction,
           type: transaction.type?.toUpperCase() || 'EXPENSE'
         }))
@@ -105,7 +119,7 @@ export default function TransactionsPage() {
   }, [supabase, router])
 
   // Utility function to ensure user exists
-  const ensureUserExists = async (user: any) => {
+  const ensureUserExists = async (user: { id: string; email?: string; user_metadata?: { name?: string } }) => {
     try {
       const { data: existingUser } = await supabase
         .from('users')

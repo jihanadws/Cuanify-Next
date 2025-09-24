@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 
@@ -48,7 +48,7 @@ export default function DatabaseDebugPage() {
         setResult(prev => prev + `\n❌ Categories table error: ${categoriesError.message}\n`)
       } else {
         setResult(prev => prev + `\n✅ Categories table check:\nFound ${categoriesData.length} categories:\n`)
-        categoriesData.forEach((cat: any) => {
+        categoriesData.forEach((cat: { name: string; type: string; is_default: boolean }) => {
           const ownership = cat.is_default ? 'default' : 'user-specific'
           setResult(prev => prev + `  - ${cat.name} (${cat.type}, ${ownership})\n`)
         })
@@ -268,7 +268,7 @@ export default function DatabaseDebugPage() {
         <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#fef3cd', borderRadius: '0.5rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#856404' }}>❗ Database Setup Instructions:</h3>
           <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#856404' }}>
-            <li>Click "Check Database Schema" to see current table status</li>
+            <li>Click &quot;Check Database Schema&quot; to see current table status</li>
             <li>If you see PGRST204 errors or missing tables:
               <ul style={{ marginTop: '0.5rem' }}>
                 <li>Go to your <strong>Supabase Dashboard</strong></li>
@@ -276,7 +276,7 @@ export default function DatabaseDebugPage() {
                 <li>Copy and run the SQL from <code>/sql/fix_schema.sql</code></li>
               </ul>
             </li>
-            <li>After running SQL, click "Setup Database" to add default data</li>
+            <li>After running SQL, click &quot;Setup Database&quot; to add default data</li>
             <li>Test by going to <a href="/transactions/add" style={{ color: '#0066cc' }}>Add Transaction</a></li>
           </ol>
           <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#d1ecf1', borderRadius: '0.375rem', border: '1px solid #bee5eb' }}>
