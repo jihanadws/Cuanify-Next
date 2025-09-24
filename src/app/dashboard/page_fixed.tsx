@@ -272,24 +272,19 @@ export default function DashboardPage() {
                   {statsCards.map((card, index) => (
                     <div key={index} className="card" style={{
                       background: card.gradient,
-                      padding: '1.25rem',
+                      padding: '1.5rem',
                       borderRadius: '1rem',
                       boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
                       border: `1px solid ${card.borderColor}`,
-                      color: 'white',
-                      minHeight: '160px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between'
+                      color: 'white'
                     }}>
                       <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
-                        marginBottom: '0.75rem',
-                        gap: '0.5rem'
+                        marginBottom: '1rem'
                       }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
+                        <div>
                           <h3 style={{
                             fontSize: '0.875rem',
                             fontWeight: '500',
@@ -300,11 +295,10 @@ export default function DashboardPage() {
                             {card.title}
                           </h3>
                           <div style={{
-                            fontSize: '1.5rem',
+                            fontSize: '1.75rem',
                             fontWeight: 'bold',
-                            lineHeight: 1.2,
-                            margin: 0,
-                            wordBreak: 'break-word'
+                            lineHeight: 1,
+                            margin: 0
                           }}>
                             {card.value}
                           </div>
@@ -319,9 +313,8 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <div style={{
-                          fontSize: '1.75rem',
-                          opacity: 0.8,
-                          flexShrink: 0
+                          fontSize: '2rem',
+                          opacity: 0.8
                         }}>
                           {card.icon}
                         </div>
@@ -330,21 +323,14 @@ export default function DashboardPage() {
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        fontSize: '0.8rem',
+                        fontSize: '0.875rem',
                         fontWeight: '500',
-                        opacity: 0.9,
-                        flexWrap: 'wrap',
-                        gap: '0.25rem'
+                        opacity: 0.9
                       }}>
-                        <span style={{ 
-                          marginRight: '0.25rem',
-                          fontSize: '0.9rem'
-                        }}>
+                        <span style={{ marginRight: '0.5rem' }}>
                           {card.indicator}
                         </span>
-                        <span style={{ fontSize: '0.75rem' }}>
-                          Status Aktif
-                        </span>
+                        Status Aktif
                       </div>
                     </div>
                   ))}
@@ -433,8 +419,8 @@ export default function DashboardPage() {
             /* Desktop Grid */
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '1rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
               marginBottom: '2rem'
             }}>
               {statsCards.map((card, index) => (
@@ -442,15 +428,11 @@ export default function DashboardPage() {
                   background: 'rgba(255, 255, 255, 0.8)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: '1rem',
-                  padding: '1.25rem',
+                  padding: '1.5rem',
                   border: `1px solid ${card.borderColor}`,
                   boxShadow: '0 25px 50px rgba(0, 0, 0, 0.1)',
                   transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  minHeight: '140px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between'
+                  cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-5px)'
@@ -464,10 +446,9 @@ export default function DashboardPage() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                    marginBottom: '0.75rem',
-                    gap: '0.5rem'
+                    marginBottom: '1rem'
                   }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div>
                       <h3 style={{
                         fontSize: '0.875rem',
                         fontWeight: '500',
@@ -478,14 +459,11 @@ export default function DashboardPage() {
                         {card.title}
                       </h3>
                       <div style={{
-                        fontSize: '1.5rem',
+                        fontSize: '1.75rem',
                         fontWeight: 'bold',
                         color: card.color,
-                        lineHeight: 1.2,
-                        margin: 0,
-                        wordBreak: 'break-word',
-                        maxWidth: '100%',
-                        overflow: 'hidden'
+                        lineHeight: 1,
+                        margin: 0
                       }}>
                         {card.value}
                       </div>
@@ -500,9 +478,8 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div style={{
-                      fontSize: '1.75rem',
-                      opacity: 0.8,
-                      flexShrink: 0
+                      fontSize: '2rem',
+                      opacity: 0.8
                     }}>
                       {card.icon}
                     </div>
@@ -511,21 +488,14 @@ export default function DashboardPage() {
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    fontSize: '0.8rem',
+                    fontSize: '0.875rem',
                     fontWeight: '500',
-                    color: card.color,
-                    flexWrap: 'wrap',
-                    gap: '0.25rem'
+                    color: card.color
                   }}>
-                    <span style={{ 
-                      marginRight: '0.25rem',
-                      fontSize: '0.9rem'
-                    }}>
+                    <span style={{ marginRight: '0.5rem' }}>
                       {card.indicator}
                     </span>
-                    <span style={{ fontSize: '0.75rem' }}>
-                      {card.title === 'Total Saldo Akun' ? 'Saldo Real' : 'Dari Transaksi'}
-                    </span>
+                    {card.title === 'Total Saldo Akun' ? 'Saldo Real' : 'Dari Transaksi'}
                   </div>
                 </div>
               ))}
@@ -552,30 +522,26 @@ export default function DashboardPage() {
               
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '0.75rem'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '1rem'
               }}>
                 {accounts.map((account) => (
                   <div key={account.id} style={{
                     background: 'rgba(255, 255, 255, 0.5)',
                     borderRadius: '0.5rem',
-                    padding: '0.875rem',
+                    padding: '1rem',
                     border: '1px solid rgba(229, 231, 235, 0.3)'
                   }}>
                     <div style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '0.5rem'
+                      alignItems: 'center'
                     }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                      <div>
                         <div style={{
                           fontSize: '0.875rem',
                           fontWeight: '500',
-                          color: '#111827',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
+                          color: '#111827'
                         }}>
                           {account.name}
                         </div>
@@ -588,11 +554,9 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div style={{
-                        fontSize: '0.875rem',
+                        fontSize: '1rem',
                         fontWeight: 'bold',
-                        color: account.balance >= 0 ? '#059669' : '#dc2626',
-                        textAlign: 'right',
-                        flexShrink: 0
+                        color: account.balance >= 0 ? '#059669' : '#dc2626'
                       }}>
                         {formatCurrency(account.balance)}
                       </div>
@@ -622,26 +586,24 @@ export default function DashboardPage() {
             
             <div style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '0.75rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1rem'
             }}>
               <button
                 onClick={() => router.push('/transactions/add')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                   background: 'linear-gradient(135deg, #059669, #047857)',
                   color: 'white',
-                  padding: '0.875rem',
+                  padding: '1rem',
                   borderRadius: '0.75rem',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  minHeight: '48px'
+                  fontSize: '1rem',
+                  fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
@@ -651,8 +613,8 @@ export default function DashboardPage() {
                   e.currentTarget.style.transform = 'translateY(0px)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}>
-                <span style={{ fontSize: '1.25rem' }}>💰</span>
-                <span style={{ whiteSpace: 'nowrap' }}>Add Transaction</span>
+                <span style={{ fontSize: '1.5rem' }}>💰</span>
+                <span>Add Transaction</span>
               </button>
 
               <button
@@ -660,18 +622,16 @@ export default function DashboardPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                   background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
                   color: 'white',
-                  padding: '0.875rem',
+                  padding: '1rem',
                   borderRadius: '0.75rem',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  minHeight: '48px'
+                  fontSize: '1rem',
+                  fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
@@ -681,8 +641,8 @@ export default function DashboardPage() {
                   e.currentTarget.style.transform = 'translateY(0px)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}>
-                <span style={{ fontSize: '1.25rem' }}>📊</span>
-                <span style={{ whiteSpace: 'nowrap' }}>View Transactions</span>
+                <span style={{ fontSize: '1.5rem' }}>📊</span>
+                <span>View Transactions</span>
               </button>
 
               <button
@@ -690,18 +650,16 @@ export default function DashboardPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                   background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                   color: 'white',
-                  padding: '0.875rem',
+                  padding: '1rem',
                   borderRadius: '0.75rem',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  minHeight: '48px'
+                  fontSize: '1rem',
+                  fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
@@ -711,8 +669,8 @@ export default function DashboardPage() {
                   e.currentTarget.style.transform = 'translateY(0px)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}>
-                <span style={{ fontSize: '1.25rem' }}>🎯</span>
-                <span style={{ whiteSpace: 'nowrap' }}>Manage Budgets</span>
+                <span style={{ fontSize: '1.5rem' }}>🎯</span>
+                <span>Manage Budgets</span>
               </button>
 
               <button
@@ -720,18 +678,16 @@ export default function DashboardPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                   background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
                   color: 'white',
-                  padding: '0.875rem',
+                  padding: '1rem',
                   borderRadius: '0.75rem',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  minHeight: '48px'
+                  fontSize: '1rem',
+                  fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
@@ -741,8 +697,8 @@ export default function DashboardPage() {
                   e.currentTarget.style.transform = 'translateY(0px)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}>
-                <span style={{ fontSize: '1.25rem' }}>🏦</span>
-                <span style={{ whiteSpace: 'nowrap' }}>Manage Accounts</span>
+                <span style={{ fontSize: '1.5rem' }}>🏦</span>
+                <span>Manage Accounts</span>
               </button>
             </div>
           </div>

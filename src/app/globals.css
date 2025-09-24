@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Debug Test */
+.css-debug-test {
+  background-color: orange !important;
+  color: white !important;
+  padding: 20px !important;
+  border: 2px solid black !important;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
