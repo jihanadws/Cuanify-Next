@@ -26,18 +26,31 @@ interface Transaction {
   type: string
 }
 
+interface Category {
+  id: string
+  name: string
+  type: 'INCOME' | 'EXPENSE'
+  color: string
+  icon: string
+  is_default: boolean
+  user_id: string | null
+  created_at: string
+  updated_at: string
+}
+
 export default function BudgetPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   
   const [formData, setFormData] = useState({
-    category: 'makanan',
+    category: '',
     amount: '',
     period: 'monthly',
     start_date: new Date().toISOString().split('T')[0]
@@ -45,8 +58,6 @@ export default function BudgetPage() {
   
   const router = useRouter()
   const supabase = createClient()
-
-  const categories = ['makanan', 'transportasi', 'belanja', 'hiburan', 'kesehatan', 'pendidikan', 'tagihan', 'lainnya']
   
   const periods = [
     { value: 'weekly', label: 'Mingguan', days: 7 },
@@ -97,6 +108,37 @@ export default function BudgetPage() {
     }
   }, [supabase])
 
+  const fetchCategories = useCallback(async (userId: string) => {
+    try {
+      // Get all categories for this user (user-created + active defaults)
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', userId)
+        .order('is_default', { ascending: false })
+        .order('name', { ascending: true })
+
+      if (error) {
+        const errorMessage = handleDatabaseError(error, 'fetch categories')
+        setError(errorMessage)
+        console.error('Error fetching categories:', error)
+      } else {
+        setCategories(data || [])
+        console.log('Categories fetched successfully:', data?.length || 0, 'records')
+        console.log('User categories:', data?.filter((cat: Category) => cat.user_id === userId).length || 0)
+        console.log('Default categories:', data?.filter((cat: Category) => cat.is_default && cat.user_id === null).length || 0)
+        console.log('Categories data:', data?.map((cat: Category) => ({ 
+          name: cat.name, 
+          is_default: cat.is_default, 
+          user_id: cat.user_id 
+        })))
+      }
+    } catch (error) {
+      console.error('Unexpected error fetching categories:', error)
+      setError('An unexpected error occurred while fetching categories')
+    }
+  }, [supabase])
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -108,11 +150,22 @@ export default function BudgetPage() {
       } else {
         fetchBudgets(user.id)
         fetchTransactions(user.id)
+        fetchCategories(user.id)
       }
     }
 
     getUser()
-  }, [router, supabase, fetchBudgets, fetchTransactions])
+  }, [router, supabase, fetchBudgets, fetchTransactions, fetchCategories])
+
+  // Set default category when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0 && !formData.category) {
+      setFormData(prev => ({
+        ...prev,
+        category: categories[0].name
+      }))
+    }
+  }, [categories, formData.category])
 
   const calculateSpent = (budget: Budget) => {
     const startDate = new Date(budget.start_date)
@@ -245,18 +298,10 @@ export default function BudgetPage() {
     return '#10b981'
   }
 
-  const getCategoryIcon = (category: string) => {
-    const icons: { [key: string]: string } = {
-      'makanan': '🍽️',
-      'transportasi': '🚗',
-      'belanja': '🛒',
-      'hiburan': '🎬',
-      'kesehatan': '🏥',
-      'pendidikan': '📚',
-      'tagihan': '📄',
-      'lainnya': '📦'
-    }
-    return icons[category.toLowerCase()] || '📦'
+  const getCategoryIcon = (categoryName: string) => {
+    // Find the category in the categories array to get the correct icon
+    const categoryData = categories.find(cat => cat.name.toLowerCase() === categoryName.toLowerCase())
+    return categoryData?.icon || '📦'
   }
 
   if (loading) {
@@ -456,11 +501,15 @@ export default function BudgetPage() {
                     }}
                     required
                   >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
-                    ))}
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <option key={category.id} value={category.name}>
+                          {category.is_default ? '🏠 ' : ''}{category.name.charAt(0).toUpperCase() + category.name.slice(1)}{category.is_default ? ' (Default)' : ''}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">Belum ada kategori</option>
+                    )}
                   </select>
                 </div>
 

@@ -19,9 +19,8 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { name: 'Dashboard', path: '/dashboard', icon: '🏠', mobileIcon: '🏠' },
   { name: 'Transactions', path: '/transactions', icon: '📊', mobileIcon: '📊' },
-  { name: 'Accounts', path: '/accounts', icon: '🏦', mobileIcon: '🏦' },
+  { name: 'Management', path: '/management', icon: '⚙️', mobileIcon: '⚙️' },
   { name: 'Budgets', path: '/budgets', icon: '💰', mobileIcon: '💰' },
-  { name: 'Categories', path: '/categories', icon: '📝', mobileIcon: '📝' },
   { name: 'Profile', path: '/profile', icon: '👤', mobileIcon: '👤' }
 ]
 

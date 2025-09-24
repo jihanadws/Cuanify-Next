@@ -90,6 +90,79 @@ export default function AddTransactionPage() {
     category.type === formData.type
   )
 
+  // Utility function to ensure user has required data
+  const ensureUserData = async (user: any) => {
+    try {
+      // Ensure user exists in users table
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (!existingUser) {
+        const { error } = await supabase
+          .from('users')
+          .insert([{
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+
+        if (error) {
+          console.error('Error creating user:', error)
+        }
+      }
+
+      // Ensure user has at least one account
+      const { data: userAccounts } = await supabase
+        .from('accounts')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+
+      if (!userAccounts || userAccounts.length === 0) {
+        // Try with currency column first
+        let { error: accountError } = await supabase
+          .from('accounts')
+          .insert([{
+            user_id: user.id,
+            name: 'Kas Utama',
+            type: 'CASH',
+            balance: 0,
+            currency: 'IDR',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+
+        // If currency or is_active columns don't exist, try simpler version
+        if (accountError && (accountError.message?.includes('currency') || accountError.message?.includes('is_active'))) {
+          const { error: fallbackError } = await supabase
+            .from('accounts')
+            .insert([{
+              user_id: user.id,
+              name: 'Kas Utama',
+              type: 'CASH',
+              balance: 0,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }])
+
+          if (fallbackError) {
+            console.error('Error creating default account:', fallbackError)
+          }
+        } else if (accountError) {
+          console.error('Error creating default account:', accountError)
+        }
+      }
+    } catch (error) {
+      console.error('Error ensuring user data:', error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
@@ -102,13 +175,26 @@ export default function AddTransactionPage() {
         return
       }
 
+      // Ensure user has required data setup
+      await ensureUserData(user)
+
       const amount = parseFloat(formData.amount)
       if (isNaN(amount) || amount <= 0) {
         setError('Please enter a valid amount')
         return
       }
 
-      const { error: insertError } = await supabase
+      // First, try to get the selected category info
+      let categoryName = 'Lainnya'
+      if (formData.category_id && categories.length > 0) {
+        const selectedCategory = categories.find(cat => cat.id === formData.category_id)
+        if (selectedCategory) {
+          categoryName = selectedCategory.name
+        }
+      }
+
+      // Try inserting with category_id first (new schema)
+      let { error: insertError } = await supabase
         .from('transactions')
         .insert([
           {
@@ -123,9 +209,38 @@ export default function AddTransactionPage() {
           }
         ])
 
+      // If category_id insert fails, try with category (old schema)
+      if (insertError && insertError.message?.includes('category_id')) {
+        console.log('Retrying with category text field instead of category_id...')
+        const { error: fallbackError } = await supabase
+          .from('transactions')
+          .insert([
+            {
+              user_id: user.id,
+              type: formData.type.toLowerCase(), // Convert to lowercase for old schema
+              category: categoryName,
+              amount: amount,
+              description: formData.description,
+              account: formData.account,
+              date: formData.date,
+              created_at: new Date().toISOString()
+            }
+          ])
+        insertError = fallbackError
+      }
+
       if (insertError) {
         const errorMessage = handleDatabaseError(insertError, 'add transaction')
-        setError(`${errorMessage}. Please check the console for setup instructions.`)
+        
+        // Check if it's a table/column not found error
+        if (insertError.message?.includes('does not exist') || 
+            insertError.message?.includes('column') ||
+            insertError.code === 'PGRST204' ||
+            insertError.code === '42P01') {
+          setError(`Database setup required. Error: ${errorMessage}. Please visit /debug/schema to set up the database properly.`)
+        } else {
+          setError(`${errorMessage}. Please check the console for more details.`)
+        }
       } else {
         setSuccess('Transaction added successfully!')
         setTimeout(() => {
@@ -266,7 +381,22 @@ export default function AddTransactionPage() {
                 marginBottom: '1rem',
                 fontSize: '0.875rem'
               }}>
-                {error}
+                <div style={{ marginBottom: '0.5rem' }}>❌ {error}</div>
+                {error.includes('Database setup required') && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <a 
+                      href="/debug/schema" 
+                      style={{ 
+                        color: '#0066cc', 
+                        textDecoration: 'underline',
+                        fontSize: '0.875rem'
+                      }}
+                      target="_blank"
+                    >
+                      🔧 Click here to set up the database
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 

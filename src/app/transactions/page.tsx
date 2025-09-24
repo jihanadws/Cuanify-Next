@@ -23,6 +23,7 @@ export default function TransactionsPage() {
   const router = useRouter()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | 'INCOME' | 'EXPENSE'>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
@@ -31,14 +32,19 @@ export default function TransactionsPage() {
 
   const fetchTransactions = useCallback(async () => {
     try {
+      setError(null) // Clear previous errors
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        router.push('/auth/login')
+        router.push('/auth/signin')
         return
       }
 
-      const { data, error } = await supabase
+      // Ensure user exists in database
+      await ensureUserExists(user)
+
+      // First try to fetch with category relation
+      let { data, error } = await supabase
         .from('transactions')
         .select(`
           *,
@@ -53,17 +59,79 @@ export default function TransactionsPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
+      // If relation query fails, try simple query
       if (error) {
-        console.error('Error fetching transactions:', error)
+        console.warn('Failed to fetch transactions with categories, trying simple query:', error)
+        
+        const simpleQuery = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+        
+        if (simpleQuery.error) {
+          console.error('Error fetching transactions:', simpleQuery.error)
+          setError('Gagal memuat data transaksi')
+        } else {
+          // Fetch categories separately if needed
+          const { data: categoriesData } = await supabase
+            .from('categories')
+            .select('*')
+          
+          // Map categories to transactions and normalize data
+          const transactionsWithCategories = (simpleQuery.data || []).map((transaction: any) => ({
+            ...transaction,
+            // Normalize transaction type to uppercase for consistency
+            type: transaction.type?.toUpperCase() || 'EXPENSE',
+            categories: categoriesData?.find((cat: any) => cat.id === transaction.category_id) || null
+          }))
+          
+          setTransactions(transactionsWithCategories)
+        }
       } else {
-        setTransactions(data || [])
+        // Normalize transaction types from main query too
+        const normalizedData = (data || []).map((transaction: any) => ({
+          ...transaction,
+          type: transaction.type?.toUpperCase() || 'EXPENSE'
+        }))
+        setTransactions(normalizedData)
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Unexpected error fetching transactions:', error)
+      setError('Terjadi kesalahan saat memuat data transaksi')
     } finally {
       setLoading(false)
     }
   }, [supabase, router])
+
+  // Utility function to ensure user exists
+  const ensureUserExists = async (user: any) => {
+    try {
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (!existingUser) {
+        const { error } = await supabase
+          .from('users')
+          .insert([{
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+
+        if (error) {
+          console.error('Error creating user:', error)
+        }
+      }
+    } catch (error) {
+      console.error('Error checking/creating user:', error)
+    }
+  }
 
   useEffect(() => {
     fetchTransactions()
@@ -94,12 +162,19 @@ export default function TransactionsPage() {
     let filtered = transactions
 
     if (filter !== 'all') {
-      filtered = filtered.filter(t => t.type === filter)
+      // Handle both uppercase and lowercase transaction types
+      const filterUpper = filter.toUpperCase()
+      const filterLower = filter.toLowerCase()
+      filtered = filtered.filter(t => 
+        t.type === filterUpper || 
+        t.type === filterLower ||
+        t.type?.toUpperCase() === filterUpper
+      )
     }
 
     if (searchTerm) {
       filtered = filtered.filter(t => 
-        t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (t.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (t.categories?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
@@ -157,6 +232,36 @@ export default function TransactionsPage() {
               fontWeight: '500',
               color: '#374151'
             }}>Loading...</div>
+          </div>
+        </div>
+      </ResponsiveLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <ResponsiveLayout>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+            <div className="flex items-center mb-4">
+              <div className="bg-red-100 rounded-full p-2 mr-3">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-red-800">Error</h3>
+            </div>
+            <p className="text-red-700 mb-4">{error}</p>
+            <button
+              onClick={() => {
+                setError(null)
+                setLoading(true)
+                fetchTransactions()
+              }}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+            >
+              Coba Lagi
+            </button>
           </div>
         </div>
       </ResponsiveLayout>
@@ -367,7 +472,7 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'INCOME')
+                  .filter(t => t.type?.toUpperCase() === 'INCOME')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -395,7 +500,7 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'EXPENSE')
+                  .filter(t => t.type?.toUpperCase() === 'EXPENSE')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -423,10 +528,10 @@ export default function TransactionsPage() {
             }}>
               {formatCurrency(
                 transactions
-                  .filter(t => t.type === 'INCOME')
+                  .filter(t => t.type?.toUpperCase() === 'INCOME')
                   .reduce((sum, t) => sum + t.amount, 0) -
                 transactions
-                  .filter(t => t.type === 'EXPENSE')
+                  .filter(t => t.type?.toUpperCase() === 'EXPENSE')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </div>
@@ -535,9 +640,9 @@ export default function TransactionsPage() {
                     <div style={{
                       fontSize: '1rem',
                       fontWeight: 'bold',
-                      color: transaction.type === 'INCOME' ? '#10b981' : '#ef4444'
+                      color: transaction.type?.toUpperCase() === 'INCOME' ? '#10b981' : '#ef4444'
                     }}>
-                      {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      {transaction.type?.toUpperCase() === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </div>
                     <button
                       onClick={(e) => {
